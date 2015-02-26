@@ -1,7 +1,7 @@
 /* 
     File: my_allocator.c
 
-    Author: <your name>
+    Author: Jaiden Gerig + Andrew Schlotzhauer
             Department of Computer Science
             Texas A&M University
     Date  : <date>
