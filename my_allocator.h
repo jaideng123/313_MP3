@@ -34,7 +34,9 @@ typedef void * Addr;
 /* FORWARDS */ 
 /*--------------------------------------------------------------------------*/
 
-/* -- (none) -- */
+Addr main_block_addr;
+unsigned int mem_size;
+unsigned int block_size;
 
 /*--------------------------------------------------------------------------*/
 /* MODULE   MY_ALLOCATOR */
@@ -54,6 +56,8 @@ int release_allocator();
    After this function is called, any allocation fails.
 */ 
 
+unsigned int next_power_2(unsigned int v);
+
 Addr my_malloc(unsigned int _length); 
 /* Allocate _length number of bytes of free memory and returns the 
    address of the allocated portion. Returns 0 when out of memory. */ 
@@ -61,5 +65,6 @@ Addr my_malloc(unsigned int _length);
 int my_free(Addr _a); 
 /* Frees the section of physical memory previously allocated 
    using ’my_malloc’. Returns 0 if everything ok. */ 
+
 
 #endif 
