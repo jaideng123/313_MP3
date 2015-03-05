@@ -49,8 +49,19 @@
 
 unsigned int init_allocator(unsigned int _basic_block_size,unsigned int _length){
 	mem_size = next_power_2(_length);
+	if(mem_size != _length)
+		mem_size = mem_size/2;
 	main_block_addr = malloc(mem_size);
 	block_size = next_power_2(_basic_block_size);
+	int counter = 1;
+	int size = mem_size;
+	while(size > block_size){
+		counter++;
+		size = size/2;
+	}
+	free_list_size = counter;
+	
+	
 	return block_size;
 }
 

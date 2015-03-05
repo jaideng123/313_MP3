@@ -7,7 +7,7 @@ int main(int argc, char ** argv) {
 
   // init_allocator(basic block size, memory length)
   
-  printf(" %u",next_power_2(9));
+  printf(" %u",next_power_2(8));
 
   //ackerman_main();
 

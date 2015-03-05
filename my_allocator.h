@@ -28,7 +28,14 @@
 /* DATA STRUCTURES */ 
 /*--------------------------------------------------------------------------*/
 
-typedef void * Addr; 
+typedef void * Addr;
+
+struct Header{
+	int order;
+	int is_free;//1 if free, 0 if not free
+	//not finished
+	
+}
 
 /*--------------------------------------------------------------------------*/
 /* FORWARDS */ 
@@ -37,6 +44,8 @@ typedef void * Addr;
 Addr main_block_addr;
 unsigned int mem_size;
 unsigned int block_size;
+Addr* free_list;
+int free_list_size;
 
 /*--------------------------------------------------------------------------*/
 /* MODULE   MY_ALLOCATOR */
