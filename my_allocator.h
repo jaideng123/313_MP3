@@ -13,6 +13,10 @@
 #ifndef _my_allocator_h_                   // include file only once
 #define _my_allocator_h_
 
+#define NULL 0
+#include <stdbool.h>
+
+
 /*--------------------------------------------------------------------------*/
 /* DEFINES */
 /*--------------------------------------------------------------------------*/
@@ -31,11 +35,12 @@
 typedef void * Addr;
 
 struct Header{
-	int order;
+	int size;
 	int is_free;//1 if free, 0 if not free
-	//not finished
-	
-}
+  struct Header* next;
+  struct Header* prev;
+	Addr mem_block;
+};
 
 /*--------------------------------------------------------------------------*/
 /* FORWARDS */ 
@@ -44,7 +49,7 @@ struct Header{
 Addr main_block_addr;
 unsigned int mem_size;
 unsigned int block_size;
-Addr* free_list;
+struct Header** free_list;
 int free_list_size;
 
 /*--------------------------------------------------------------------------*/

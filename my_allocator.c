@@ -54,13 +54,19 @@ unsigned int init_allocator(unsigned int _basic_block_size,unsigned int _length)
 	main_block_addr = malloc(mem_size);
 	block_size = next_power_2(_basic_block_size);
 	int counter = 1;
-	int size = mem_size;
+	unsigned int size = mem_size;
 	while(size > block_size){
 		counter++;
 		size = size/2;
 	}
 	free_list_size = counter;
-	
+	free_list = malloc(free_list_size*sizeof(struct Header *));
+	free_list[0] = (struct Header *)main_block_addr;
+	free_list[0]->size = mem_size;
+	free_list[0]->is_free = true;
+	int i;
+	for(i=1;i<free_list_size;++i)
+		free_list[i] = NULL;
 	
 	return block_size;
 }
