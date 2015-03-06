@@ -64,6 +64,7 @@ unsigned int init_allocator(unsigned int _basic_block_size,unsigned int _length)
 	free_list[0] = (struct Header *)main_block_addr;
 	free_list[0]->size = mem_size;
 	free_list[0]->is_free = true;
+	free_list[0]->mem_block = main_block_addr+sizeof(struct Header *);
 	int i;
 	for(i=1;i<free_list_size;++i)
 		free_list[i] = NULL;
@@ -72,6 +73,8 @@ unsigned int init_allocator(unsigned int _basic_block_size,unsigned int _length)
 }
 
 int release_allocator(){
+	free(main_block_addr);
+	free(free_list);
 	return 0;
 }
 
