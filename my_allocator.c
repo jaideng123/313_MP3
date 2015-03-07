@@ -64,6 +64,9 @@ unsigned int init_allocator(unsigned int _basic_block_size,unsigned int _length)
 	free_list[0] = (struct Header *)main_block_addr;
 	free_list[0]->size = mem_size;
 	free_list[0]->is_free = true;
+	free_list[0]->is_left = true;
+	free_list[0]->next = NULL;
+	free_list[0]->prev = NULL;
 	free_list[0]->mem_block = main_block_addr+sizeof(struct Header *);
 	int i;
 	for(i=1;i<free_list_size;++i)
@@ -89,6 +92,42 @@ unsigned int next_power_2(unsigned int v){
 	v++;
 	return v;
 }
+
+int split (int order){
+	struct Header* temp = free_list[order];
+	//look for block to split
+	while(temp != NULL && !temp->is_free){
+		temp = temp->next;
+	}
+	if(temp == NULL)
+		return 1;
+	
+}
+
+int add_to_list(struct Header* h,int order){
+	//empty list
+	if (free_list[order] == NULL){
+		free_list[order] = h;
+		h->next = NULL;
+		h->prev = NULL;
+	}
+	else{
+		struct Header* temp = free_list[order];
+		//search for end
+		while(temp->next != NULL)
+			temp = temp->next;
+		temp->next = h;
+		h->next = NULL;
+		h->prev = temp;
+	}
+	return 0;
+}
+
+struct Header* remove_from_list()(int order){
+	
+	
+}
+
 
 extern Addr my_malloc(unsigned int _length) {
   /* This preliminary implementation simply hands the call over the 
