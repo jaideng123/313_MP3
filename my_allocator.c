@@ -151,7 +151,7 @@ void print_free_lists(){
 		printf("List : %i \n",i);
 		struct Header* temp = free_list[i];
 		while(temp != NULL){
-			printf("Size: %u Free: %i Addr:%p \n",free_list[i]->size,free_list[i]->is_free,free_list[i]);
+			printf("Size: %u Free: %i Addr:%p \n",temp->size,temp->is_free,temp);
 			temp = temp->next;
 		}
 	}
