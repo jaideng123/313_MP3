@@ -23,6 +23,7 @@
 /*--------------------------------------------------------------------------*/
 
 #include<stdlib.h>
+#include <math.h>
 #include "my_allocator.h"
 
 /*--------------------------------------------------------------------------*/
@@ -64,15 +65,12 @@ unsigned int init_allocator(unsigned int _basic_block_size,unsigned int _length)
 	free_list[0] = (struct Header *)main_block_addr;
 	free_list[0]->size = mem_size;
 	free_list[0]->is_free = true;
-	free_list[0]->is_left = true;
 	free_list[0]->next = NULL;
-	free_list[0]->prev = NULL;
-	free_list[0]->mem_block = main_block_addr+sizeof(struct Header *);
 	int i;
 	for(i=1;i<free_list_size;++i)
 		free_list[i] = NULL;
 	
-	return block_size;
+	return mem_size;
 }
 
 int release_allocator(){
@@ -95,37 +93,69 @@ unsigned int next_power_2(unsigned int v){
 
 int split (int order){
 	struct Header* temp = free_list[order];
+	struct Header* prev = NULL;
 	//look for block to split
 	while(temp != NULL && !temp->is_free){
 		temp = temp->next;
+		prev = temp;
 	}
 	if(temp == NULL)
 		return 1;
-	
-}
-
-int add_to_list(struct Header* h,int order){
-	//empty list
-	if (free_list[order] == NULL){
-		free_list[order] = h;
-		h->next = NULL;
-		h->prev = NULL;
+	//remove first element of list
+	if(prev == NULL){
+		free_list[order] = temp->next;
 	}
+	//remove other element of list
 	else{
-		struct Header* temp = free_list[order];
-		//search for end
-		while(temp->next != NULL)
-			temp = temp->next;
-		temp->next = h;
-		h->next = NULL;
-		h->prev = temp;
+		prev->next = temp->next;
 	}
+	struct Header* free = free_list[order+1];
+	if(free == NULL){
+		//insert left
+		free_list[order+1] = temp;
+		free_list[order+1]->size = (mem_size/pow(2,order+1));
+		free_list[order+1]->is_free = true;
+		//insert right
+		free_list[order+1]->next = temp + (int)(mem_size/pow(2,order+1));
+		free_list[order+1]->next->is_free = true;
+		free_list[order+1]->next->size = free_list[order+1]->size;
+		free_list[order+1]->next->next = NULL;
+		return 0;
+	}
+	while(free < temp -(int)(mem_size/pow(2,order+1)) && free->next != NULL){
+		free = free->next;
+	}
+	struct Header* next = free->next;
+	//insert left
+	free->next = temp;
+	free->next->size = (mem_size/pow(2,order+1));
+	free->next->is_free = true;
+	//insert right
+	free->next->next = temp + (int)(mem_size/pow(2,order+1));
+	free->next->next->is_free = true;
+	free->next->next->size = free->next->size;
+	free->next->next->next = next;
 	return 0;
 }
 
-struct Header* remove_from_list()(int order){
-	
-	
+int add_to_list(struct Header* h,int order){
+	return 0;
+}
+
+struct Header* remove_from_list(int order){
+	return 0;
+}
+void print_free_lists(){
+	int i;
+	for(i=0;i<free_list_size;++i){
+		printf("List : %i \n",i);
+		struct Header* temp = free_list[i];
+		while(temp != NULL){
+			printf("Size: %u Free: %i Addr:%p \n",free_list[i]->size,free_list[i]->is_free,free_list[i]);
+			temp = temp->next;
+		}
+	}
+	printf("\n");
 }
 
 
