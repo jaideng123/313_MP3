@@ -13,6 +13,12 @@ int main(int argc, char ** argv) {
   print_free_lists();
   split(1);
   print_free_lists();
+  split(2);
+  print_free_lists();
+  split(2);
+  print_free_lists();
+  consolidate();
+  print_free_lists();
   //ackerman_main();
 
   release_allocator();

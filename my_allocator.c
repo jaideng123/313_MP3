@@ -138,6 +138,48 @@ int split (int order){
 	return 0;
 }
 
+int consolidate(){
+	int i;
+	for(i = free_list_size-1; i >= 0; --i){
+		struct Header* temp = free_list[i];
+		struct Header* prev = NULL;
+		while(temp != NULL){
+			int is_next = (temp->next != NULL && temp->next->next !=NULL);
+			if(temp->next == NULL)
+				break;
+			if(temp->is_free && temp->next->is_free){
+				if(prev == NULL)
+					free_list[i] = temp->next->next;
+				else
+					prev->next = temp->next->next;
+				struct Header* free = free_list[i-1];
+				if(free == NULL){
+					//insert
+					free_list[i-1] = temp;
+					free_list[i-1]->size = (mem_size/pow(2,i-1));
+					free_list[i-1]->is_free = true;
+					free_list[i-1]->next = NULL;
+				}
+				else{
+					while(free < temp && free->next != NULL)
+						free = free->next;
+					struct Header* next = free->next;
+					//insert
+					free->next = temp;
+					free->next->size = (mem_size/pow(2,i-1));
+					free->next->is_free = true;
+					free->next->next = next;
+				}
+			}
+			if(prev != NULL)
+				temp = prev->next;
+			else
+				temp = free_list[i];
+		}
+	}
+	return 0;
+}
+
 int add_to_list(struct Header* h,int order){
 	return 0;
 }
