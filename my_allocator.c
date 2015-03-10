@@ -50,7 +50,7 @@
 
 unsigned int init_allocator(unsigned int _basic_block_size,unsigned int _length){
 	mem_size = next_power_2(_length);
-	if(mem_size != _length)
+	if(mem_size == _length*2)
 		mem_size = mem_size/2;
 	main_block_addr = malloc(mem_size);
 	block_size = next_power_2(_basic_block_size);
@@ -202,11 +202,11 @@ void print_free_lists(){
 
 
 extern Addr my_malloc(unsigned int _length) {
-  /* This preliminary implementation simply hands the call over the 
-     the C standard library! 
-     Of course this needs to be replaced by your implementation.
-  */
-  return malloc((size_t)_length);
+	int alloc_size = next_power_2(_length);
+	if(alloc_size  == _length*2)
+		alloc_size = mem_size/2;
+  	consolidate();
+  	return malloc((size_t)_length);
 }
 
 extern int my_free(Addr _a) {

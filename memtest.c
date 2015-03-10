@@ -5,7 +5,7 @@ int main(int argc, char ** argv) {
 
   // input parameters (basic block size, memory length)
 
-  init_allocator(8, 64);
+  init_allocator(8, 65);
   print_free_lists();
   split(0);
   print_free_lists();
