@@ -52,7 +52,7 @@ unsigned int init_allocator(unsigned int _basic_block_size,unsigned int _length)
 	mem_size = next_power_2(_length);
 	if(mem_size == _length*2)
 		mem_size = mem_size/2;
-	main_block_addr = malloc(mem_size);
+	main_block_addr = malloc(mem_size + 100000);
 	block_size = next_power_2(_basic_block_size);
 	int counter = 1;
 	unsigned int size = mem_size;
@@ -122,7 +122,7 @@ int split (int order){
 		free_list[order+1]->size = (mem_size/pow(2,order+1));
 		free_list[order+1]->is_free = true;
 		//insert right
-		free_list[order+1]->next = temp + free_list[order+1]->size;
+		free_list[order+1]->next = (Addr)temp + free_list[order+1]->size;
 		free_list[order+1]->next->is_free = true;
 		free_list[order+1]->next->size = free_list[order+1]->size;
 		free_list[order+1]->next->next = NULL;
