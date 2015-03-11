@@ -90,14 +90,20 @@ unsigned int next_power_2(unsigned int v){
 	v++;
 	return v;
 }
+// Calculates log2 of number.  
+long double Log2( double n )  
+{  
+    // log(n)/log(2) is log2.  
+    return log( n ) / log( 2 );  
+}
 
 int split (int order){
 	struct Header* temp = free_list[order];
 	struct Header* prev = NULL;
 	//look for block to split
 	while(temp != NULL && !temp->is_free){
-		temp = temp->next;
 		prev = temp;
+		temp = temp->next;
 	}
 	if(temp == NULL)
 		return 1;
@@ -116,7 +122,7 @@ int split (int order){
 		free_list[order+1]->size = (mem_size/pow(2,order+1));
 		free_list[order+1]->is_free = true;
 		//insert right
-		free_list[order+1]->next = temp + (int)(mem_size/pow(2,order+1));
+		free_list[order+1]->next = temp + free_list[order+1]->size;
 		free_list[order+1]->next->is_free = true;
 		free_list[order+1]->next->size = free_list[order+1]->size;
 		free_list[order+1]->next->next = NULL;
@@ -170,11 +176,13 @@ int consolidate(){
 					free->next->is_free = true;
 					free->next->next = next;
 				}
+				if(prev != NULL)
+					temp = prev->next;
+				else
+					temp = free_list[i];
 			}
-			if(prev != NULL)
-				temp = prev->next;
 			else
-				temp = free_list[i];
+				temp = temp->next->next;
 		}
 	}
 	return 0;
@@ -200,18 +208,46 @@ void print_free_lists(){
 	printf("\n");
 }
 
+Addr find_free_node(int index){
+	struct Header* temp = free_list[index];
+  	while(temp != NULL && !temp->is_free){
+  		temp = temp->next;
+  	}
+  	if(temp != NULL){
+  		temp->is_free = false;
+  		return(Addr)temp+sizeof(*temp);
+  	}
+  	else
+  		return NULL;
+}
+
 
 extern Addr my_malloc(unsigned int _length) {
-	int alloc_size = next_power_2(_length);
+	int alloc_size = next_power_2(_length + sizeof(struct Header));
 	if(alloc_size  == _length*2)
 		alloc_size = mem_size/2;
+	print_free_lists();
   	consolidate();
-  	return malloc((size_t)_length);
+  	int index = Log2(mem_size/alloc_size);
+  	int offset = 0;
+  	Addr return_addr = NULL;
+  	while(return_addr == NULL){
+	  	return_addr = find_free_node(index);
+	  	if(return_addr != NULL){
+	  		return return_addr;
+	  	}
+	  	split(offset);
+	  	offset++;
+	  	if(offset >= free_list_size){
+	  		break;
+	  	}
+  	}
+  	return NULL;
 }
 
 extern int my_free(Addr _a) {
-  /* Same here! */
-  free(_a);
+  struct Header* temp = (struct Header*) (_a - sizeof(struct Header));
+  temp->is_free = true;
   return 0;
 }
 
