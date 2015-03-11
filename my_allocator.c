@@ -137,7 +137,7 @@ int split (int order){
 	free->next->size = (mem_size/pow(2,order+1));
 	free->next->is_free = true;
 	//insert right
-	free->next->next = temp + (int)(mem_size/pow(2,order+1));
+	free->next->next = (Addr)free->next + free->next->size;
 	free->next->next->is_free = true;
 	free->next->next->size = free->next->size;
 	free->next->next->next = next;
@@ -223,10 +223,10 @@ Addr find_free_node(int index){
 
 
 extern Addr my_malloc(unsigned int _length) {
-	int alloc_size = next_power_2(_length + sizeof(struct Header));
+	int alloc_size = next_power_2(_length);
 	if(alloc_size  == _length*2)
 		alloc_size = mem_size/2;
-	print_free_lists();
+	alloc_size = next_power_2(alloc_size + sizeof(struct Header));
   	consolidate();
   	int index = Log2(mem_size/alloc_size);
   	int offset = 0;
@@ -234,6 +234,7 @@ extern Addr my_malloc(unsigned int _length) {
   	while(return_addr == NULL){
 	  	return_addr = find_free_node(index);
 	  	if(return_addr != NULL){
+	  		//print_free_lists();
 	  		return return_addr;
 	  	}
 	  	split(offset);
