@@ -149,6 +149,7 @@ int consolidate(){
 	for(i = free_list_size-1; i >= 0; --i){
 		struct Header* temp = free_list[i];
 		struct Header* prev = NULL;
+		//print_free_lists();
 		while(temp != NULL){
 			int is_next = (temp->next != NULL && temp->next->next !=NULL);
 			if(temp->next == NULL)
@@ -159,6 +160,7 @@ int consolidate(){
 				else
 					prev->next = temp->next->next;
 				struct Header* free = free_list[i-1];
+				//empty row
 				if(free == NULL){
 					//insert
 					free_list[i-1] = temp;
@@ -167,14 +169,24 @@ int consolidate(){
 					free_list[i-1]->next = NULL;
 				}
 				else{
-					while(free < temp && free->next != NULL)
+					struct Header* prev_2 = NULL;
+					while(free < temp && free != NULL){
+						prev_2 = free;
 						free = free->next;
-					struct Header* next = free->next;
+					}
 					//insert
-					free->next = temp;
-					free->next->size = (mem_size/pow(2,i-1));
-					free->next->is_free = true;
-					free->next->next = next;
+					if(prev_2 != NULL){
+						prev_2->next = temp;
+						prev_2->next->size = (mem_size/pow(2,i-1));
+						prev_2->next->is_free = true;
+						prev_2->next->next = free;
+					}
+					else{
+						free_list[i-1] = temp;
+						free_list[i-1]->size = (mem_size/pow(2,i-1));
+						free_list[i-1]->is_free = true;
+						free_list[i-1]->next = free;
+					}
 				}
 				if(prev != NULL)
 					temp = prev->next;
@@ -234,7 +246,6 @@ extern Addr my_malloc(unsigned int _length) {
   	while(return_addr == NULL){
 	  	return_addr = find_free_node(index);
 	  	if(return_addr != NULL){
-	  		//print_free_lists();
 	  		return return_addr;
 	  	}
 	  	split(offset);
@@ -247,7 +258,7 @@ extern Addr my_malloc(unsigned int _length) {
 }
 
 extern int my_free(Addr _a) {
-  struct Header* temp = (struct Header*) (_a - sizeof(struct Header));
+  struct Header* temp = (_a - sizeof(struct Header));
   temp->is_free = true;
   return 0;
 }
