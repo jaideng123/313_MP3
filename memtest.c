@@ -4,7 +4,35 @@
 int main(int argc, char ** argv) {
 
   // input parameters (basic block size, memory length)
-
+  /* ========================================================== */
+  
+    int c;
+	int index;
+	int b = 8;
+	int s = 10000;
+	while ((c = getopt (argc, argv, "b:s:")) != -1) {
+		switch(c) {
+		case 'b':
+			b = atoi(optarg);
+			break;
+		case 's':
+			s = atoi(optarg);
+			break;
+		case '?':
+			if (optopt == 'c')
+				fprintf(stderr, "Option -%c requires an argument.\n", optopt);
+			else if (isprint (optopt))
+				fprintf(stderr, "Unknown option '-%c'.\n", optopt);
+			else
+				fprintf(stderr, "Unknown option character '\\x%x'.\n", optopt);
+			return 1;
+		default:
+			abort();
+		}
+	}
+	
+/* ========================================================== */
+  
   init_allocator(8, 1000000);
   print_free_lists();
   //consolidate();
@@ -36,4 +64,10 @@ int main(int argc, char ** argv) {
   //ackerman_main();
 
   release_allocator();
+  
+  //for getopt failures
+  for (index = optind; index < argc; ++index) {
+      printf("Non-option argument %s\n", argv[index]);
+  }
+  return 0;
 }
