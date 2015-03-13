@@ -115,32 +115,10 @@ int split (int order){
 	else{
 		prev->next = temp->next;
 	}
-	struct Header* free = free_list[order+1];
-	if(free == NULL){
-		//insert left
-		free_list[order+1] = temp;
-		free_list[order+1]->size = (mem_size/pow(2,order+1));
-		free_list[order+1]->is_free = true;
-		//insert right
-		free_list[order+1]->next = (Addr)temp + free_list[order+1]->size;
-		free_list[order+1]->next->is_free = true;
-		free_list[order+1]->next->size = free_list[order+1]->size;
-		free_list[order+1]->next->next = NULL;
-		return 0;
-	}
-	while(free < temp -(int)(mem_size/pow(2,order+1)) && free->next != NULL){
-		free = free->next;
-	}
-	struct Header* next = free->next;
-	//insert left
-	free->next = temp;
-	free->next->size = (mem_size/pow(2,order+1));
-	free->next->is_free = true;
-	//insert right
-	free->next->next = (Addr)free->next + free->next->size;
-	free->next->next->is_free = true;
-	free->next->next->size = free->next->size;
-	free->next->next->next = next;
+	add_to_list(temp,order+1);
+	struct Header* right = (Addr)temp + (int)(mem_size/pow(2,order+1));
+	add_to_list(right,order+1);
+	//print_free_lists();
 	return 0;
 }
 
@@ -148,59 +126,69 @@ int consolidate(){
 	int i;
 	for(i = free_list_size-1; i >= 0; --i){
 		struct Header* temp = free_list[i];
+		struct Header* next = NULL;
 		struct Header* prev = NULL;
 		//print_free_lists();
 		while(temp != NULL){
-			int is_next = (temp->next != NULL && temp->next->next !=NULL);
 			if(temp->next == NULL)
 				break;
+			next = temp->next->next;
 			if(temp->is_free && temp->next->is_free){
 				if(prev == NULL)
-					free_list[i] = temp->next->next;
+					free_list[i] = next;
 				else
-					prev->next = temp->next->next;
-				struct Header* free = free_list[i-1];
-				//empty row
-				if(free == NULL){
-					//insert
-					free_list[i-1] = temp;
-					free_list[i-1]->size = (mem_size/pow(2,i-1));
-					free_list[i-1]->is_free = true;
-					free_list[i-1]->next = NULL;
-				}
-				else{
-					struct Header* prev_2 = NULL;
-					while(free < temp && free != NULL){
-						prev_2 = free;
-						free = free->next;
-					}
-					//insert
-					if(prev_2 != NULL){
-						prev_2->next = temp;
-						prev_2->next->size = (mem_size/pow(2,i-1));
-						prev_2->next->is_free = true;
-						prev_2->next->next = free;
-					}
-					else{
-						free_list[i-1] = temp;
-						free_list[i-1]->size = (mem_size/pow(2,i-1));
-						free_list[i-1]->is_free = true;
-						free_list[i-1]->next = free;
-					}
-				}
-				if(prev != NULL)
-					temp = prev->next;
-				else
-					temp = free_list[i];
+					prev->next = next;
+				add_to_list(temp,i-1);
+				temp = next;
 			}
-			else
-				temp = temp->next->next;
+			else{
+				prev = temp->next;
+				temp = next;
+			}
 		}
 	}
 	return 0;
 }
 
 int add_to_list(struct Header* h,int order){
+	struct Header* temp = free_list[order];
+	struct Header* prev = NULL;
+	//list is empty
+	if(temp == NULL){
+		free_list[order] = h;
+		h->size = (mem_size/pow(2,order));
+		h->is_free = true;
+		h->next = NULL;
+		return 0;
+	}
+	//search for node to insert in
+	while(temp < h && temp->next != NULL){
+		prev = temp;
+		temp = temp->next;
+	}
+	if(prev == NULL){
+		if(temp > h){
+			free_list[order] = h;
+			free_list[order]->size = (mem_size/pow(2,order));
+			free_list[order]->is_free = true;
+			free_list[order]->next = temp;
+		}
+		else if(temp < h){
+			free_list[order]->next = h;
+			free_list[order]->next->size = (mem_size/pow(2,order));
+			free_list[order]->next->is_free = true;
+			free_list[order]->next->next = NULL;
+		}
+		else
+			printf("Ya Done Fucked up\n");
+
+	}
+	else{
+		prev->next = h;
+		prev->next->size = (mem_size/pow(2,order));
+		prev->next->is_free = true;
+		prev->next->next = temp;
+	}
 	return 0;
 }
 
@@ -243,13 +231,17 @@ extern Addr my_malloc(unsigned int _length) {
   	int index = Log2(mem_size/alloc_size);
   	int offset = 0;
   	Addr return_addr = NULL;
+  	//printf("%i\n",alloc_size );
   	while(return_addr == NULL){
 	  	return_addr = find_free_node(index);
 	  	if(return_addr != NULL){
 	  		return return_addr;
 	  	}
+	  	if(offset == index)
+	  		break;
 	  	split(offset);
 	  	offset++;
+	  	//print_free_lists();
 	  	if(offset >= free_list_size){
 	  		break;
 	  	}
@@ -258,6 +250,8 @@ extern Addr my_malloc(unsigned int _length) {
 }
 
 extern int my_free(Addr _a) {
+	if(_a == NULL)
+		return 1;
   struct Header* temp = (_a - sizeof(struct Header));
   temp->is_free = true;
   return 0;
