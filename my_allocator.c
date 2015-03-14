@@ -115,8 +115,10 @@ int split (int order){
 	else{
 		prev->next = temp->next;
 	}
+	temp->is_left = true;
 	add_to_list(temp,order+1);
 	struct Header* right = (Addr)temp + (int)(mem_size/pow(2,order+1));
+	right->is_left = false;
 	add_to_list(right,order+1);
 	//print_free_lists();
 	return 0;
@@ -133,7 +135,7 @@ int consolidate(){
 			if(temp->next == NULL)
 				break;
 			next = temp->next->next;
-			if(temp->is_free && temp->next->is_free){
+			if(temp->is_free && temp->next->is_free && temp->is_left && !temp->next->is_left){
 				if(prev == NULL)
 					free_list[i] = next;
 				else
