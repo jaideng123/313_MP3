@@ -1,14 +1,15 @@
 #include "ackerman.h"
 #include "my_allocator.h"
-#include <stdio.h>
+#include <unistd.h>
 #include <getopt.h>
+
 
 int main(int argc, char ** argv) {
 
   // input parameters (basic block size, memory length)
   /* ========================================================== */
   
-  int c;
+    int c;
 	int index;
 	int b = 8;
 	int s = 10000;
@@ -21,12 +22,12 @@ int main(int argc, char ** argv) {
 			s = atoi(optarg);
 			break;
 		case '?':
-			if (optopt == 'c')
-				fprintf(stderr, "Option -%c requires an argument.\n", optopt);
+		/*	if (optopt == 'c')
+				//fprintf(stderr, "Option -%c requires an argument.\n", optopt);
 			else if (isprint (optopt))
-				fprintf(stderr, "Unknown option '-%c'.\n", optopt);
+				//fprintf(stderr, "Unknown option '-%c'.\n", optopt);
 			else
-				fprintf(stderr, "Unknown option character '\\x%x'.\n", optopt);
+				//fprintf(stderr, "Unknown option character '\\x%x'.\n", optopt);*/
 			return 1;
 		default:
 			abort();

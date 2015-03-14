@@ -12,5 +12,5 @@ memtest.o : memtest.c
 	gcc -c -g -lm memtest.c
 
 memtest: memtest.o ackerman.o my_allocator.o
-	gcc -o -g -lm memtest.o ackerman.o my_allocator.o
+	gcc -g -lm memtest.o ackerman.o my_allocator.o -o memtest
 
