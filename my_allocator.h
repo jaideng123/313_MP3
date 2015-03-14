@@ -36,7 +36,8 @@ typedef void * Addr;
 
 struct Header{
 	unsigned int size;
-	int is_free;//1 if free, 0 if not free
+	short int is_free;//1 if free, 0 if not free
+	short int is_left;//1 if left 0 if right
 	struct Header* next;
 };
 
