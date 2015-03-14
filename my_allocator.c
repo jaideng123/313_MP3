@@ -184,10 +184,19 @@ int add_to_list(struct Header* h,int order){
 
 	}
 	else{
+		if(temp < h && temp->next == NULL){
+			temp->next = h;
+			temp->next->is_free = true;
+			temp->next->size = (mem_size/pow(2,order));
+			temp->next->next = NULL;
+			
+		}
+		else{
 		prev->next = h;
 		prev->next->size = (mem_size/pow(2,order));
 		prev->next->is_free = true;
 		prev->next->next = temp;
+		}
 	}
 	return 0;
 }
