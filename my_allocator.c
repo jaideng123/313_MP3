@@ -145,8 +145,8 @@ int consolidate(){
 				temp = next;
 			}
 			else{
-				prev = temp->next;
-				temp = next;
+				prev = temp;
+				temp = temp->next;
 			}
 		}
 	}
@@ -176,14 +176,12 @@ int add_to_list(struct Header* h,int order){
 			free_list[order]->is_free = true;
 			free_list[order]->next = temp;
 		}
-		else if(temp < h){
+		else{
 			free_list[order]->next = h;
 			free_list[order]->next->size = (mem_size/pow(2,order));
 			free_list[order]->next->is_free = true;
 			free_list[order]->next->next = NULL;
 		}
-		else
-			printf("Ya Done Fucked up\n");
 
 	}
 	else{
